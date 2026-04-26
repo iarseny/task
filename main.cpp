@@ -16,6 +16,49 @@ double rnd() {
 
 int n, k;
 
+// Функция для локального поиска (hill climbing)
+int hillClimbing(vector<pii>& coords, vector<pii>& best_coords) {
+    int best_val = f(coords);
+    best_coords = coords;
+    bool improved = true;
+    
+    while (improved) {
+        improved = false;
+        for (int i = 0; i < k; i++) {
+            for (int x = 1; x <= n; x++) {
+                for (int y = 1; y <= n; y++) {
+                    // Пропускаем текущую позицию
+                    if (coords[i].first == x && coords[i].second == y) continue;
+                    
+                    // Проверяем, не занята ли клетка другим ферзём
+                    bool occupied = false;
+                    for (int j = 0; j < k; j++) {
+                        if (i != j && coords[j].first == x && coords[j].second == y) {
+                            occupied = true;
+                            break;
+                        }
+                    }
+                    if (occupied) continue;
+                    
+                    pii old_pos = coords[i];
+                    coords[i] = {x, y};
+                    int val = f(coords);
+                    
+                    if (val > best_val) {
+                        best_val = val;
+                        best_coords = coords;
+                        improved = true;
+                    } else {
+                        coords[i] = old_pos;
+                    }
+                }
+            }
+        }
+    }
+    coords = best_coords;
+    return best_val;
+}
+
 int f(vector<pii> coords) {
     vector<vector<int>> mat(n + 1, vector<int>(n + 1));
     for (auto i : coords) {
